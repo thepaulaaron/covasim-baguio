@@ -1,0 +1,1 @@
+This folder stores all output from the simulations and data analysis.

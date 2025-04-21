@@ -1,0 +1,36 @@
+# 🐍 Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 🗃 Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# 🧪 Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# 💾 VSCode / editor configs
+.vscode/
+*.code-workspace
+
+# 📦 Python dependency files
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# 📄 Log or runtime files
+*.log
+*.sqlite
+*.db
+
+# 🔒 Secrets (if any)
+.env
+
+# 📦 OS-related files
+.DS_Store
+Thumbs.db

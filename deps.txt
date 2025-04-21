@@ -1,0 +1,4 @@
+covasim==3.1.6
+matplotlib>=3.8.0
+pandas>=2.1.0
+jupyterlab>=4.0.0

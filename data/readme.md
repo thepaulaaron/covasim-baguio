@@ -1,0 +1,1 @@
+This folder stores the raw, mock, or official data needed to run the simulations.
