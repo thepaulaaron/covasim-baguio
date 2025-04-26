@@ -34,3 +34,5 @@ build/
 # 📦 OS-related files
 .DS_Store
 Thumbs.db
+
+.xlsx
