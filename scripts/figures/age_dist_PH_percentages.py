@@ -92,17 +92,31 @@ autolabel(rects2)
 fig.tight_layout()
 plt.show()
 
-# 7. Statistical Test: Chi-squared
+# # 7. Statistical Test: Chi-squared
 
-# Rescale covasim to match actual total
-covasim_scaled = covasim_coarse_population * (actual_coarse_population.sum() / covasim_coarse_population.sum())
+# # Rescale covasim to match actual total
+# covasim_scaled = covasim_coarse_population * (actual_coarse_population.sum() / covasim_coarse_population.sum())
 
-# Chi-squared test
-chi2_stat, p_value = chisquare(f_obs=actual_coarse_population, f_exp=covasim_scaled)
-print(f"\nChi-Squared Statistic = {chi2_stat:.2f}")
-print(f"P-Value = {p_value:.4f}")
+# # Chi-squared test
+# chi2_stat, p_value = chisquare(f_obs=actual_coarse_population, f_exp=covasim_scaled)
+# print(f"\nChi-Squared Statistic = {chi2_stat:.2f}")
+# print(f"P-Value = {p_value:.4f}")
 
-if p_value < 0.05:
-    print("❌ Statistically significant difference between distributions.")
-else:
-    print("✅ No statistically significant difference — distributions are similar.")
+# if p_value < 0.05:
+#     print("❌ Statistically significant difference between distributions.")
+# else:
+#     print("✅ No statistically significant difference — distributions are similar.")
+
+# 8. Calculate Error Metrics
+
+# Differences
+differences = covasim_percentages - actual_percentages
+
+# Mean Absolute Error (MAE)
+mae = np.mean(np.abs(differences))
+
+# Root Mean Squared Error (RMSE)
+rmse = np.sqrt(np.mean(differences**2))
+
+print(f"\nMean Absolute Error (MAE): {mae:.4f}%")
+print(f"Root Mean Squared Error (RMSE): {rmse:.4f}%")
