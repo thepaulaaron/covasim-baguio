@@ -19,7 +19,6 @@ def summarize_population(sim, scaled=False):
     ages = people.age
     print("\n📊 Age Distribution (sample):")
 
-
     print(np.round(np.percentile(ages,
         # Min, Q1, Median, Q3, Max
         [0, 25, 50, 75, 100]), 1))  
@@ -39,10 +38,38 @@ def summarize_population(sim, scaled=False):
     # for size in sorted(size_counts):
     #     print(f"{size} members: {size_counts[size]} households")
 
-    # Plot age distribution
-    plt.figure(figsize=(10, 6))
-    plt.hist(ages, bins=30, edgecolor='k', alpha=0.7)
+    # Custom age groups (non-overlapping)
+    age_groups = [
+        ("0–4", 0, 4),
+        ("5–14", 5, 14),
+        ("15–24", 15, 24),
+        ("25–30", 25, 30),
+        ("31–49", 31, 49),
+        ("50–64", 50, 64),
+        ("65+", 65, 120)
+    ]
 
+    # Count number of people in each group
+    group_counts = {}
+    for label, lower, upper in age_groups:
+        count = np.sum((ages >= lower) & (ages <= upper))
+        group_counts[label] = count
+
+    # Print group counts
+    print("\n📊 Age Group Counts:")
+    total = len(ages)
+    for label, count in group_counts.items():
+        percent = (count / total) * 100
+        print(f"{label}: {count:,} people ({percent:.2f}%)")
+
+    # Plotting
+    labels = list(group_counts.keys())
+    values = list(group_counts.values())
+
+    plt.figure(figsize=(12, 6))
+    plt.bar(labels, values, color='skyblue', edgecolor='k')
+    # plt.xticks(rotation=45, ha='right')
+    
     if scaled:
         plt.title(f"PH Age Distribution (Scaled for {len(sim.people) * sim.pars['pop_scale']:.0f} people)")
     else:
@@ -50,6 +77,7 @@ def summarize_population(sim, scaled=False):
 
     plt.xlabel("Age")
     plt.ylabel("Number of People")
+    plt.tight_layout()
     plt.show()
 
 def populate_ph(n):
