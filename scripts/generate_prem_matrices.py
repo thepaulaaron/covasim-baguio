@@ -13,6 +13,9 @@ def plot_contact_matrix(df, ax, title, vmin=None, vmax=None):
     # Set the columns and index to the age labels
     df.columns = age_labels
     df.index = age_labels
+
+    # Transpose the matrix: contacting age group (originally rows) becomes x-axis (patterned to original Prem data)
+    df = df.T  
     
     # Reverse the order of the rows to make sure the matrix starts from the lowest (y-axis)
     df = df[::-1]
@@ -43,8 +46,8 @@ def plot_contact_matrix(df, ax, title, vmin=None, vmax=None):
     
     # Set the title and labels for axes
     ax.set_title(title)
-    ax.set_xlabel("Contacted Age Group")
-    ax.set_ylabel("Contacting Age Group")
+    ax.set_xlabel("Contacting Age Group")
+    ax.set_ylabel("Contacted Age Group")
     
     # Set the ticks for x and y axes
     ax.set_xticks(range(len(age_labels)))  # Set the position of the ticks (indexes)
@@ -73,26 +76,26 @@ df_work = pd.read_csv("data/from_prem_et_al/contact_work_PHL.csv", header=None)
 
 # Manually define the vmin and vmax values based on the data characteristics or your preference
 
-# No adjustment of vmin and vmax
-vmin_all, vmin_all, vmin_home, vmax_all, vmax_home, vmin_others, vmax_others, vmin_school, vmax_school, vmin_work, vmax_work = None, None, None, None, None, None, None, None, None, None, None
+# # No adjustment of vmin and vmax
+# vmin_all, vmin_all, vmin_home, vmax_all, vmax_home, vmin_others, vmax_others, vmin_school, vmax_school, vmin_work, vmax_work = None, None, None, None, None, None, None, None, None, None, None
 
 # 10th percentile of the minimum values in the matrix
 # 90th percentile of the maximum values in the matrix
 
-# vmin_all = df_all.quantile(0.10).min()
-# vmax_all = df_all.quantile(0.90).max() 
+vmin_all = df_all.quantile(0.10).min()
+vmax_all = df_all.quantile(0.90).max() 
 
-# vmin_home = df_home.quantile(0.10).min() 
-# vmax_home = df_home.quantile(0.90).max() 
+vmin_home = df_home.quantile(0.10).min() 
+vmax_home = df_home.quantile(0.90).max() 
 
-# vmin_others = df_others.quantile(0.10).min()
-# vmax_others = df_others.quantile(0.90).max()
+vmin_others = df_others.quantile(0.10).min()
+vmax_others = df_others.quantile(0.90).max()
 
-# vmin_school = df_school.quantile(0.10).min()
-# vmax_school = df_school.quantile(0.90).max()
+vmin_school = df_school.quantile(0.10).min()
+vmax_school = df_school.quantile(0.90).max()
 
-# vmin_work = df_work.quantile(0.10).min()
-# vmax_work = df_work.quantile(0.90).max()
+vmin_work = df_work.quantile(0.10).min()
+vmax_work = df_work.quantile(0.90).max()
 
 # Create a subplot to plot all variants in one page
 fig, axs = plt.subplots(3, 2, figsize=(15, 12))
