@@ -45,7 +45,7 @@ def plot_contact_matrix(df, ax, title, vmin=None, vmax=None):
     custom_ticks_y = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75]
     
     # Set the title and labels for axes
-    ax.set_title(title)
+    # ax.set_title(title)
     ax.set_xlabel("Contacting Age Group")
     ax.set_ylabel("Contacted Age Group")
     
@@ -98,17 +98,26 @@ vmin_work = df_work.quantile(0.10).min()
 vmax_work = df_work.quantile(0.90).max()
 
 # Create a subplot to plot all variants in one page
-fig, axs = plt.subplots(3, 2, figsize=(15, 12))
+# fig, axs = plt.subplots(3, 2, figsize=(15, 12))
+fig, ax = plt.subplots(figsize=(10, 8)) # single plot
 
 # Plot each matrix on the respective axis with manually adjusted vmin and vmax
-plot_contact_matrix(df_all, axs[0, 0], "Contact Matrix - All", vmin_all, vmax_all)
-plot_contact_matrix(df_home, axs[0, 1], "Contact Matrix - Home", vmin_home, vmax_home)
-plot_contact_matrix(df_others, axs[1, 0], "Contact Matrix - Others", vmin_others, vmax_others)
-plot_contact_matrix(df_school, axs[1, 1], "Contact Matrix - School", vmin_school, vmax_school)
-plot_contact_matrix(df_work, axs[2, 0], "Contact Matrix - Work", vmin_work, vmax_work)
+
+# FOR MULTIPLE PLOTS
+  # plot_contact_matrix(df_all, axs[0, 0], "Contact Matrix - All", vmin_all, vmax_all)
+  # plot_contact_matrix(df_home, axs[0, 1], "Contact Matrix - Home", vmin_home, vmax_home)
+  # plot_contact_matrix(df_others, axs[1, 0], "Contact Matrix - Others", vmin_others, vmax_others)
+  # plot_contact_matrix(df_school, axs[1, 1], "Contact Matrix - School", vmin_school, vmax_school)
+  # plot_contact_matrix(df_work, axs[2, 0], "Contact Matrix - Work", vmin_work, vmax_work)
+
+# plot_contact_matrix(df_all, ax, "Contact Matrix - All", vmin_all, vmax_all)
+# plot_contact_matrix(df_home, ax, "Contact Matrix - Home", vmin_home, vmax_home)
+# plot_contact_matrix(df_others, ax, "Contact Matrix - Others", vmin_others, vmax_others)
+# plot_contact_matrix(df_school, ax, "Contact Matrix - School", vmin_school, vmax_school)
+plot_contact_matrix(df_work, ax, "Contact Matrix - Work", vmin_work, vmax_work)
 
 # Remove the empty subplot
-fig.delaxes(axs[2, 1])
+# fig.delaxes(axs[2, 1])
 
 # Adjust layout to prevent overlap
 plt.tight_layout()
