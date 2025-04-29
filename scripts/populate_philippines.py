@@ -5,10 +5,11 @@ import numpy as np
 import concurrent.futures
 from tqdm import tqdm 
 from collections import Counter
+import time
 
 # PH_POP_household = 108_667_043
 PH_POP_household = 100_000
-PH_POP_total     = 109_035_343
+# PH_POP_total     = 109_035_343
 
 # -------------------------------------------------- #
 
@@ -41,26 +42,42 @@ def summarize_population(sim, scaled=False):
     # Custom age groups (non-overlapping)
     age_groups = [
         ("0–4", 0, 4),
-        ("5–14", 5, 14),
-        ("15–24", 15, 24),
-        ("25–30", 25, 30),
-        ("31–49", 31, 49),
-        ("50–64", 50, 64),
-        ("65+", 65, 120)
+        ("5–9", 5, 9),
+        ("10–14", 10, 14),
+        ("15–19", 15, 19),
+        ("20–24", 20, 24),
+        ("25–29", 25, 29),
+        ("30–34", 30, 34),
+        ("35–39", 35, 39),
+        ("40–44", 40, 44),
+        ("45–49", 45, 49),
+        ("50–54", 50, 54),
+        ("55–59", 55, 59),
+        ("60–64", 60, 64),
+        ("65–69", 65, 69),
+        ("70–74", 70, 74),
+        ("75–79", 75, 79),
+        ("80+", 80, 120),
     ]
 
-    # Count number of people in each group
     group_counts = {}
     for label, lower, upper in age_groups:
         count = np.sum((ages >= lower) & (ages <= upper))
+        if scaled:
+            # Scale the count
+            count = count * sim.pars['pop_scale']
         group_counts[label] = count
 
     # Print group counts
     print("\n📊 Age Group Counts:")
-    total = len(ages)
+    total = 0
     for label, count in group_counts.items():
+        total += count
         percent = (count / total) * 100
-        print(f"{label}: {count:,} people ({percent:.2f}%)")
+        print(f"{label}: {count:,.0f} people ({percent:.2f}%)")
+
+    # Print total count
+    print(f"\n🔢 Total Population: {total:,.0f} people")
 
     # Plotting
     labels = list(group_counts.keys())
@@ -81,6 +98,7 @@ def summarize_population(sim, scaled=False):
     plt.show()
 
 def populate_ph(n):
+    start = time.time()
     sim = cv.Sim(
         pop_size = n,
         pop_type='hybrid',
@@ -88,7 +106,11 @@ def populate_ph(n):
         label='Philippines Population Example'
     )
     sim.initialize()
+    end = time.time()
+    elapsed = end - start
+
     print(f"\n✅ Population size: {len(sim.people)}")
+    print(f"✅ populate_ph() took {elapsed:.2f} seconds.")
 
     summarize_population(sim, False)
 
@@ -100,19 +122,31 @@ def populate_ph(n):
 
 def populate_ph_scaled(n):
     pop_scale = PH_POP_household / n
+    transmuted_pop_size = (n * 1.20)
 
+    start = time.time()
     sim = cv.Sim(
-        pop_size=n,
+        pop_size=transmuted_pop_size,
         pop_scale=pop_scale,
         rescale=True,
         pop_type='hybrid',
         location='Philippines',
-        label='Philippines Population Example'
+        label='Philippines Population Example',
+        verbose=1                          # Enable verbosity for debugging
     )
     sim.initialize()
 
-    print(f"\n✅ Number of agents created: {len(sim.people)}")
-    print(f"🌏 Virtual simulated population size: {len(sim.people) * sim.pars['pop_scale']:.0f}")
+    # Correct the pop_scale AFTER knowing true len(sim.people)
+    true_n = len(sim.people)
+    sim['pop_scale'] = PH_POP_household / true_n
+
+    end = time.time()
+    elapsed = end - start
+
+    print(f"\n✅ Number of agents created: {true_n}")
+    print(f"🌏 Virtual simulated population size: {true_n * sim.pars['pop_scale']:.0f}")
+    print(f"🌏 Population scaling factor: {sim.pars['pop_scale']:.2f}")
+    print(f"✅ populate_ph_scaled() took {elapsed:.2f} seconds.")
 
     # Get the plot of agents' data (age, gender, etc.)
     # Default plot for simulated agents
@@ -125,8 +159,8 @@ def populate_ph_scaled(n):
     return sim
 
 if __name__ == '__main__':
-    # population = 100e3
+    # population = PH_POP_household
     # sim = populate_ph(population)
 
-    simulated_agents = 100e3
+    simulated_agents = 100_000
     sim = populate_ph_scaled(simulated_agents)
