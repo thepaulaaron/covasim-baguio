@@ -34,28 +34,69 @@ class store_seir(cv.Analyzer):
         return
 
     def plot(self):
-        fig, ax = plt.subplots()
-        ax.plot(self.t, self.tracked_states['susceptible'], label='Susceptible')
-        ax.plot(self.t, self.tracked_states['exposed'], label='Exposed')
-        ax.plot(self.t, self.tracked_states['infectious'], label='Infectious')
-        ax.plot(self.t, self.tracked_states['recovered'], label='Recovered')
-        ax.plot(self.t, self.tracked_states['dead'], label='Dead')
+        # Plot cumulative counts
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 8))
+        
+        # Define color map for all states
+        color_map = {
+            'susceptible': 'blue',
+            'exposed': 'yellow',
+            'infectious': 'red',
+            'infectious_asym': 'orange',
+            'infectious_sym': 'darkred',
+            'recovered': 'green',
+            'dead': 'violet'
+        }
+        
+        # Cumulative counts plot
+        for state in self.tracked_states:
+            ax1.plot(self.t, self.tracked_states[state], 
+                    label=state.replace('_', ' ').title(), 
+                    color=color_map[state])
 
-        ax.legend()
-        ax.set_xlabel('Day')
-        ax.set_ylabel('People')
+        ax1.legend()
+        ax1.set_xlabel('Day')
+        ax1.set_ylabel('People')
+        ax1.set_title('Cumulative Counts')
+        ax1.set_ylim(bottom=0)
+        ax1.get_yaxis().set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
 
-        # Set y-axis to start at 0
-        ax.set_ylim(bottom=0)
+        # Daily counts plot
+        for state in self.tracked_states:
+            daily_counts = [0] + [self.tracked_states[state][i] - self.tracked_states[state][i-1] 
+                                for i in range(1, len(self.tracked_states[state]))]
+            
+            ax2.plot(self.t, daily_counts, 
+                    label=f'Daily {state.replace("_", " ").title()}', 
+                    color=color_map[state], 
+                    alpha=0.7)
 
-        # Format y-axis ticks with commas
-        ax.get_yaxis().set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
+        ax2.legend()
+        ax2.set_xlabel('Day')
+        ax2.set_ylabel('Daily New Cases')
+        ax2.set_title('Daily Counts')
+        ax2.set_ylim(bottom=0)
+        ax2.get_yaxis().set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
 
+        plt.tight_layout()
         plt.show()
         return
 
-sim = cv.Sim(pop_size = 500,
-            pop_infected = 100, n_days=180, analyzers=store_seir(label='seir'))
+BAGUIO_population_hh = 366358
+
+sim = cv.Sim(
+        # Setters
+        pop_size = 500,
+        pop_type = 'hybrid',
+        location = 'Philippines',
+        # pop_infected = 100,  # default
+        n_days=180, 
+
+        # Baguio-calibrated Parameters
+        # beta = 0.01042,
+        rel_death_prob = 0.05180,
+
+        analyzers=store_seir(label='seir'))
 sim.run()
 seir = sim.get_analyzer('seir') # Retrieve by label
 
@@ -69,7 +110,7 @@ for t, S, E, I, I_asymp, I_symp, R, D in zip(seir.t,
                             seir.tracked_states['infectious_sym'], 
                             seir.tracked_states['recovered'], 
                             seir.tracked_states['dead']):
-    total = S + E + I + R + D
+    total = S + E + I + D
     print(f"{t}\t{S:,}\t{E:,}\t{I:,} ({I_asymp}+{I_symp}) \t{R:,}\t{D:,}\t{total:,}")
 
 
