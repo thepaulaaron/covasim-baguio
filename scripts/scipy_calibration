@@ -1,0 +1,30 @@
+#Sample calibration using scipy nelder-mead.
+
+import covasim as cv
+import numpy as np
+from scipy import optimize
+
+def objective(x, n_runs=10):
+    print(f'Running sim for beta={x[0]}, rel_death_prob={x[1]}')
+    pars = dict(
+        pop_size        = 366_000,
+        start_day       = '2020-02-01',
+        end_day         = '2020-04-11',
+        beta            = x[0],
+        rel_death_prob = x[1],
+        verbose         = 0,
+    )  #include here the parameter/s to be guessed (see beta and rel_death_prob as example for syntax)
+    sim = cv.Sim(pars=pars, datafile='D:/covasim/examples/example_data.csv', interventions=cv.test_num(daily_tests='data')) #Edit datafile location 
+    msim = cv.MultiSim(sim)
+    msim.run(n_runs=n_runs)
+    mismatches = []
+    for sim in msim.sims:
+        fit = sim.compute_fit()
+        mismatches.append(fit.mismatch)
+    mismatch = np.mean(mismatches)
+    return mismatch
+
+if __name__ == '__main__':
+    guess = [0.015, 1] # Initial guess of parameters -- beta and relative death probability
+    pars = optimize.minimize(objective, x0=guess, method='nelder-mead') # Run the optimization
+    print(pars)
